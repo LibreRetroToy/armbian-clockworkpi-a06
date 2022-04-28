@@ -1,15 +1,3 @@
-From 4dac77e355c2e25659e8c654661b2f7679fb6eeb Mon Sep 17 00:00:00 2001
-From: CXM <littlecxm@gmail.com>
-Date: Sun, 24 Apr 2022 14:41:30 +0800
-Subject: [PATCH] power
-
----
- drivers/mfd/axp20x.c                   |  1 +
- drivers/mfd/rk808.c                    |  8 +++++
- drivers/power/supply/axp20x_ac_power.c |  3 ++
- drivers/power/supply/axp20x_battery.c  | 44 ++++++++++++++++++++++++++
- 4 files changed, 56 insertions(+)
-
 diff --git a/drivers/mfd/axp20x.c b/drivers/mfd/axp20x.c
 index 8161a5dc68e8..ec615b6463cb 100644
 --- a/drivers/mfd/axp20x.c

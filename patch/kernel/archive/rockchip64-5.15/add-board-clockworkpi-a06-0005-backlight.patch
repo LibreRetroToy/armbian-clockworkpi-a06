@@ -1,15 +1,3 @@
-From 8dee53fa2073be3ac92e5ed76ab5313a70c5afee Mon Sep 17 00:00:00 2001
-From: CXM <littlecxm@gmail.com>
-Date: Sat, 23 Apr 2022 00:09:24 +0800
-Subject: [PATCH 5/5] backlight
-
----
- drivers/video/backlight/Kconfig      |   6 +
- drivers/video/backlight/Makefile     |   1 +
- drivers/video/backlight/ocp8178_bl.c | 277 +++++++++++++++++++++++++++
- 3 files changed, 284 insertions(+)
- create mode 100644 drivers/video/backlight/ocp8178_bl.c
-
 diff --git a/drivers/video/backlight/Kconfig b/drivers/video/backlight/Kconfig
 index e32694c13da5..a54a4b44c53f 100644
 --- a/drivers/video/backlight/Kconfig

@@ -1,15 +1,3 @@
-From 9b27bf5976d4f502325fb00db6a0e0215497224e Mon Sep 17 00:00:00 2001
-From: CXM <littlecxm@gmail.com>
-Date: Sat, 23 Apr 2022 00:04:43 +0800
-Subject: [PATCH 4/5] panel
-
----
- drivers/gpu/drm/panel/Kconfig        |  13 ++
- drivers/gpu/drm/panel/Makefile       |   1 +
- drivers/gpu/drm/panel/panel-cwd686.c | 283 +++++++++++++++++++++++++++
- 3 files changed, 297 insertions(+)
- create mode 100644 drivers/gpu/drm/panel/panel-cwd686.c
-
 diff --git a/drivers/gpu/drm/panel/Kconfig b/drivers/gpu/drm/panel/Kconfig
 index af1402d83d51..d3d2f0e32ace 100644
 --- a/drivers/gpu/drm/panel/Kconfig

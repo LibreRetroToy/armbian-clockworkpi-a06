@@ -1,18 +1,3 @@
-From 22450b35e558a7958b0eb7d0d7e1986b84ac84b9 Mon Sep 17 00:00:00 2001
-From: CXM <littlecxm@gmail.com>
-Date: Mon, 25 Apr 2022 21:54:22 +0800
-Subject: [PATCH] add clockworkpi-a06
-
----
- arch/arm/dts/Makefile                         |   1 +
- .../dts/rk3399-clockworkpi-a06-u-boot.dtsi    |  24 +++
- arch/arm/dts/rk3399-clockworkpi-a06.dts       | 163 ++++++++++++++++++
- configs/clockworkpi-a06-rk3399_defconfig      |  54 ++++++
- 4 files changed, 242 insertions(+)
- create mode 100644 arch/arm/dts/rk3399-clockworkpi-a06-u-boot.dtsi
- create mode 100644 arch/arm/dts/rk3399-clockworkpi-a06.dts
- create mode 100644 configs/clockworkpi-a06-rk3399_defconfig
-
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
 index 9fb38682e6..a6d8361602 100644
 --- a/arch/arm/dts/Makefile
