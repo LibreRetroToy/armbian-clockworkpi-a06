@@ -1,6 +1,6 @@
 # armbian Clockworkpi DevTerm A06
 
-Current based on [v22.02](https://github.com/armbian/build/tree/v22.02) `1ee290a2f9e0d606feffef296816311ea2be50d9`
+Current based on [v22.02](https://github.com/armbian/build/tree/master) `4a80910d6c834b78637b5e3813fc52a4b1ad0ec2`
 
 ## Spec
 
