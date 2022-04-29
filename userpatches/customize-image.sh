@@ -34,12 +34,14 @@ InstallClockworkpiA06() {
 	# disable serial autologin
 	rm -f /etc/systemd/system/getty@.service.d/override.conf
 	rm -f /etc/systemd/system/serial-getty@.service.d/override.conf
-	systemctl daemon-reload
 
 	# add user
 	USER=cpi
 	adduser --quiet --disabled-password --home /home/"$USER" --gecos "$USER" "$USER"
-	echo "$USER" | passwd "$USER" >/dev/null 2>&1
+	(
+		echo $USER
+		echo $USER
+	) | passwd root >/dev/null 2>&1
 	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
 		usermod -aG "${USER}" "${USER}" 2>/dev/null
 	done
@@ -69,14 +71,9 @@ InstallClockworkpiA06() {
 	chown "$USER":"$USER" /home/"$USER"/.Xauthority
 	chmod +x /etc/update-motd.d/*
 
-	# rotate
-
 	# select cinnamon session
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
-
-	sed -i '/systemctl\ disable\ armbian-firstrun/a \
-	sleep 30 && sync && reboot' /usr/lib/armbian/armbian-firstrun
 
 	# clean up and force password change on first boot
 	umount /proc/mdstat
