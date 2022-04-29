@@ -22,15 +22,27 @@ Main() {
 } # Main
 
 InstallClockworkpiA06() {
-	echo root:root | chpasswd
-	rm /root/.not_logged_in_yet
+	# env
 	export LANG=C LC_ALL="en_US.UTF-8"
 	export DEBIAN_FRONTEND=noninteractive
 	export APT_LISTCHANGES_FRONTEND=none
 
+	# change root password
+	echo root:root | chpasswd
+	rm /root/.not_logged_in_yet
+
+	# disable serial autologin
+	rm -f /etc/systemd/system/getty@.service.d/override.conf
+	rm -f /etc/systemd/system/serial-getty@.service.d/override.conf
+	systemctl daemon-reload
+
 	# add user
 	USER=cpi
-	adduser --quiet --disabled-password --home /home/${USER} --gecos ${USER} ${USER}
+	adduser --quiet --disabled-password --home /home/"$USER" --gecos "$USER" "$USER"
+	echo "$USER" | passwd "$USER" >/dev/null 2>&1
+	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
+		usermod -aG "${USER}" "${USER}" 2>/dev/null
+	done
 
 	# locale
 	LOCALES="en_US.UTF-8"
@@ -50,6 +62,14 @@ InstallClockworkpiA06() {
 		autologin-user-timeout=0
 		user-session=xfce
 	EOF
+	ln -sf /lib/systemd/system/lightdm.service /etc/systemd/system/display-manager.service
+
+	# set up profile sync daemon on desktop systems
+	touch /home/"$USER"/.Xauthority
+	chown "$USER":"$USER" /home/"$USER"/.Xauthority
+	chmod +x /etc/update-motd.d/*
+
+	# rotate
 
 	# select cinnamon session
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
@@ -61,6 +81,7 @@ InstallClockworkpiA06() {
 	# clean up and force password change on first boot
 	umount /proc/mdstat
 	chage -d 0 root
+
 } # InstallClockworkpiA06
 
 Main "$@"
