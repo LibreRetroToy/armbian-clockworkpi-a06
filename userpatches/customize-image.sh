@@ -81,14 +81,15 @@ InstallClockworkpiA06() {
 	apt install -y -q arandr chromium vlc cpupower-gui xfce4-power-manager
 
 	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
-	apt --yes --force-yes --allow-unauthenticated --fix-missing --no-install-recommends install ${OVERLAY_PATH}/blobs/gearboxplus_2.0_arm64.deb
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install ${OVERLAY_PATH}/blobs/gearboxplus_2.0_arm64.deb
 
 	# set up build-in tools
-	apt --yes --force-yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
-	apt --yes --force-yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
 
-	# clean up and force password change on first boot
-	umount /proc/mdstat
+	# clean up
+	apt clean
 	chage -d 0 root
 
 } # InstallClockworkpiA06
