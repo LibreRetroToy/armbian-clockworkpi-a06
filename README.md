@@ -34,3 +34,15 @@ Current based on [v22.02](https://github.com/armbian/build/tree/master) `4a80910
     ├── customize-image.sh               User: script will execute just before closing the image
     └── config-default.conf              User: default user config file
 ```
+
+## Build
+
+Build options:
+
+```bash
+./compile.sh  BOARD=clockworkpi-a06 BRANCH=current RELEASE=bullseye BUILD_MINIMAL=no BUILD_DESKTOP=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base DESKTOP_APPGROUPS_SELECTED="browsers chat desktop_tools editors internet multimedia office programming remote_desktop" COMPRESS_OUTPUTIMAGE=sha,gpg,img
+```
+
+## Deps
+
+[apt](https://github.com/littlecxm/clockworkpi-apt)
