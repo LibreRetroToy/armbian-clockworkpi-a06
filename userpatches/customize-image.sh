@@ -42,7 +42,7 @@ InstallClockworkpiA06() {
 	(
 		echo $USER
 		echo $USER
-	) | passwd root >/dev/null 2>&1
+	) | passwd $USER >/dev/null 2>&1
 	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
 		usermod -aG "${USER}" "${USER}" 2>/dev/null
 	done
