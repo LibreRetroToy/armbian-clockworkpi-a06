@@ -16,6 +16,7 @@ RELEASE=$1
 LINUXFAMILY=$2
 BOARD=$3
 BUILD_DESKTOP=$4
+OVERLAY_PATH="/tmp/overlay"
 
 Main() {
 	InstallClockworkpiA06
@@ -79,6 +80,9 @@ InstallClockworkpiA06() {
 	wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
 	echo "deb https://raw.githubusercontent.com/clockworkpi/apt/main/debian/ stable main" | sudo tee -a /etc/apt/sources.list.d/clockworkpi.list
 	sudo apt install devterm-thermal-printer devterm-thermal-printer-cups devterm-wiringpi-cpi
+
+	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
+	dpkg -i ${OVERLAY_PATH}/gearboxplus_2.0_arm64.deb
 
 	# install tools
 	apt update
