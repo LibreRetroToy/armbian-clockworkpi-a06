@@ -77,16 +77,16 @@ InstallClockworkpiA06() {
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
 
 	# set up build-in tools
-	dpkg -i ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
-	dpkg -i ${OVERLAY_PATH}}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
-	dpkg -i ${OVERLAY_PATH}}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
+	apt install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
+	apt install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
+	apt install -y ${OVERLAY_PATH}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
 
 	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
-	dpkg -i ${OVERLAY_PATH}}/blobs/gearboxplus_2.0_arm64.deb
+	apt install -y ${OVERLAY_PATH}/blobs/gearboxplus_2.0_arm64.deb
 
 	# install tools
 	apt update
-	apt install -y -q arandr chromium-browser vlc cpupower-gui xfce4-power-manager
+	apt install -y -q arandr chromium vlc cpupower-gui xfce4-power-manager
 
 	# clean up and force password change on first boot
 	umount /proc/mdstat
