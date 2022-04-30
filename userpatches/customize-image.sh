@@ -77,12 +77,12 @@ InstallClockworkpiA06() {
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
 
 	# set up build-in tools
-	wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
-	echo "deb https://raw.githubusercontent.com/clockworkpi/apt/main/debian/ stable main" | sudo tee -a /etc/apt/sources.list.d/clockworkpi.list
-	sudo apt install devterm-thermal-printer devterm-thermal-printer-cups devterm-wiringpi-cpi
+	dpkg -i ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
+	dpkg -i ${OVERLAY_PATH}}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
+	dpkg -i ${OVERLAY_PATH}}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
 
 	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
-	dpkg -i ${OVERLAY_PATH}/gearboxplus_2.0_arm64.deb
+	dpkg -i ${OVERLAY_PATH}}/blobs/gearboxplus_2.0_arm64.deb
 
 	# install tools
 	apt update

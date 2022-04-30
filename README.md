@@ -32,7 +32,7 @@ Current based on [v22.02](https://github.com/armbian/build/tree/master) `4a80910
 |       └── u-boot-rockchip64            For entire kernel family
 └── userpatches                          User: configuration patching area
     ├── customize-image.sh               User: script will execute just before closing the image
-    └── config-default.conf              User: default user config file
+    └── overlay                          Directory on host is bind-mounted to /tmp/overlay in chroot
 ```
 
 ## Build
