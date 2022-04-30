@@ -75,6 +75,15 @@ InstallClockworkpiA06() {
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/11-armbian.conf
 	[[ -x $(command -v cinnamon) ]] && sed -i "s/user-session.*/user-session=cinnamon/" /etc/lightdm/lightdm.conf.d/22-armbian-autologin.conf
 
+	# set up build-in tools
+	wget -O - https://raw.githubusercontent.com/clockworkpi/apt/main/debian/KEY.gpg | sudo apt-key add -
+	echo "deb https://raw.githubusercontent.com/clockworkpi/apt/main/debian/ stable main" | sudo tee -a /etc/apt/sources.list.d/clockworkpi.list
+	sudo apt install devterm-thermal-printer devterm-thermal-printer-cups devterm-wiringpi-cpi
+
+	# install tools
+	apt update
+	apt install -y -q arandr chromium-browser vlc cpupower-gui xfce4-power-manager
+
 	# clean up and force password change on first boot
 	umount /proc/mdstat
 	chage -d 0 root
