@@ -43,6 +43,7 @@ InstallClockworkpiA06() {
 		echo $USER
 		echo $USER
 	) | passwd $USER >/dev/null 2>&1
+	echo -e "${USER} ALL=(ALL) NOPASSWD: NOPASSWD: ALL" >>/etc/sudoers
 	for additionalgroup in sudo netdev audio video disk tty users games dialout plugdev input bluetooth systemd-journal ssh; do
 		usermod -aG "${USER}" "${USER}" 2>/dev/null
 	done
