@@ -45,4 +45,4 @@ Build options:
 
 ## Deps
 
-[apt](https://github.com/littlecxm/clockworkpi-apt)
+[apt](https://github.com/libreclockworkpi/packages)
