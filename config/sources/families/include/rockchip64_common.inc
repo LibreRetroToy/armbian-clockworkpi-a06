@@ -229,12 +229,7 @@ setup_write_uboot_platform() {
 
 family_tweaks() {
 
-	if [[ $BOARD == clockworkpi-a06 ]]; then
-
-		# rotate screen
-		echo 'extraargs=fbcon=rotate:1' >>"${SDCARD}"/boot/armbianEnv.txt
-
-	elif [[ $BOARD == z28pro ]]; then
+	if [[ $BOARD == z28pro ]]; then
 
 		chroot $SDCARD /bin/bash -c "systemctl --no-reload enable z28pro-bluetooth.service >/dev/null 2>&1"
 
