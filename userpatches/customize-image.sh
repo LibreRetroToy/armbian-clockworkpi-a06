@@ -85,8 +85,8 @@ InstallClockworkpiA06() {
 
 	# set up build-in tools
 	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
-	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
-	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
+	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
+	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
 
 	# clean up
 	apt clean
