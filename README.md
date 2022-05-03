@@ -53,6 +53,12 @@ Default build script will build all packages and images:
   - `xfce4-power-manager`
   - `WiringPi`
 
+## Acknoledgements
+
+- [korneliuszo/devterm-printer](https://github.com/korneliuszo/devterm-printer)
+- [maxfierke/linux-clockworkpi-a06](https://github.com/maxfierke/linux-clockworkpi-a06)
+- [maxfierke/clockworkpi-a06-post-install](https://github.com/maxfierke/clockworkpi-a06-post-install)
+
 ## Deps
 
 [apt](https://github.com/libreclockworkpi/packages)

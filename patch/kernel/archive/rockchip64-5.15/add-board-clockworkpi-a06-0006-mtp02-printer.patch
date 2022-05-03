@@ -1,0 +1,1856 @@
+diff --git a/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts b/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts
+new file mode 100644
+index 000000000000..915af8259f0f
+--- /dev/null
++++ b/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts
+@@ -0,0 +1,1024 @@
++/*
++ * SPDX-License-Identifier: (GPL-2.0+ or MIT)
++ * Copyright (c) 2017 Fuzhou Rockchip Electronics Co., Ltd.
++ * Copyright (c) 2018 Akash Gajjar <Akash_Gajjar@mentor.com>
++ * Copyright (c) 2020 Armbian (chwe17, piter75)
++ * Copyright (c) 2021 Clockwork Tech LLC
++ * Copyright (c) 2021 Max Fierke <max@maxfierke.com>
++ * Copyright (c) 2022 CXM <littlecxm@gmail.com>
++ * Copyright (c) 2022 Korneliusz Osmenda <korneliuszo@gmail.com>
++ *
++ */
++
++/dts-v1/;
++#include <dt-bindings/input/linux-event-codes.h>
++#include <dt-bindings/pwm/pwm.h>
++#include <dt-bindings/usb/pd.h>
++#include "rk3399.dtsi"
++#include "rk3399-opp.dtsi"
++
++/ {
++	model = "Clockworkpi A06";
++	compatible = "clockworkpi,clockworkpi-a06", "rockchip,rk3399";
++
++	chosen {
++		stdout-path = "serial2:1500000n8";
++	};
++
++	aliases {
++		spi1 = &spi1;
++	};
++
++	usb_vbus: usb-vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_vbus";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		vin-supply = <&vcc5v0_sys>;
++
++		regulator-state-mem {
++			regulator-on-in-suspend;
++		};
++	};
++
++	usb3_vbus: usb3-vbus {
++		compatible = "regulator-fixed";
++		regulator-name = "usb3_vbus";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		vin-supply = <&vcc5v0_sys>;
++
++		regulator-state-mem {
++			regulator-on-in-suspend;
++		};
++	};
++
++	vcc3v0_sd: vcc3v0-sd {
++		compatible = "regulator-fixed";
++		enable-active-high;
++		gpio = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&sdmmc0_pwr_h>;
++		regulator-name = "vcc3v0_sd";
++		regulator-always-on;
++		regulator-min-microvolt = <3000000>;
++		regulator-max-microvolt = <3000000>;
++		vin-supply = <&vcc3v3_sys>;
++
++		regulator-state-mem {
++			regulator-off-in-suspend;
++		};
++	};
++
++	vcc3v3_sys: vcc3v3-sys {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc3v3_sys";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		vin-supply = <&vcc_sys>;
++
++		regulator-state-mem {
++			regulator-on-in-suspend;
++		};
++	};
++
++	vcc5v0_sys: vcc5v0-sys {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc5v0_sys";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		vin-supply = <&vcc_sys>;
++
++		regulator-state-mem {
++			regulator-on-in-suspend;
++		};
++	};
++
++	vcc_sys: vcc-sys {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_sys";
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vdd_log: vdd-log {
++		compatible = "pwm-regulator";
++		pwms = <&pwm2 0 25000 1>;
++		regulator-name = "vdd_log";
++		regulator-min-microvolt = <800000>;
++		regulator-max-microvolt = <1400000>;
++		regulator-always-on;
++		regulator-boot-on;
++		vin-supply = <&vcc3v3_sys>;
++	};
++
++	dw_hdmi_audio: dw-hdmi-audio {
++		status = "disable";
++		compatible = "rockchip,dw-hdmi-audio";
++		#sound-dai-cells = <0>;
++	};
++
++	hdmi_sound: hdmi-sound {
++		status = "okay";
++	};
++
++	sdio_pwrseq: sdio-pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		clocks = <&rk808 1>;
++		clock-names = "ext_clock";
++		pinctrl-names = "default";
++		pinctrl-0 = <&wifi_enable_h>;
++
++		/*
++		 * On the module itself this is one of these (depending
++		 * on the actual card populated):
++		 * - SDIO_RESET_L_WL_REG_ON
++		 * - PDN (power down when low)
++		 */
++		reset-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_LOW>;
++	};
++
++	es8388-sound {
++		status = "okay";
++		compatible = "simple-audio-card";
++		pinctrl-names = "default";
++		pinctrl-0 = <&hp_det>;
++		simple-audio-card,format = "i2s";
++		simple-audio-card,name = "rockchip,es8388-codec";
++		simple-audio-card,mclk-fs = <256>;
++		simple-audio-card,widgets =
++			"Headphone Mic", "Mic Jack",
++			"Headphone", "Headphones",
++			"Speaker", "Speaker";
++		simple-audio-card,routing =
++			"LINPUT2", "Mic Jack",
++			"RINPUT2", "Mic Jack",
++			"Mic Jack", "Mic Bias",
++			"Headphones", "LOUT2",
++			"Headphones", "ROUT2",
++			"Speaker Amplifier INL", "LOUT2",
++			"Speaker Amplifier INR", "ROUT2",
++			"Speaker", "Speaker Amplifier OUTL",
++			"Speaker", "Speaker Amplifier OUTR";
++
++		simple-audio-card,hp-det-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_HIGH>;
++		simple-audio-card,aux-devs = <&speaker_amp>;
++		simple-audio-card,pin-switches = "Speaker";
++
++		simple-audio-card,cpu {
++			sound-dai = <&i2s0>;
++			system-clock-frequency = <11289600>;
++		};
++		simple-audio-card,codec {
++			sound-dai = <&es8388>;
++			system-clock-frequency = <11289600>;
++		};
++	};
++
++	speaker_amp: speaker-amplifier {
++		compatible = "simple-audio-amplifier";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pa_en>;
++		enable-gpios = <&gpio3 RK_PB1 GPIO_ACTIVE_HIGH>;
++		sound-name-prefix = "Speaker Amplifier";
++		VCC-supply = <&vcc5v0_sys>;
++	};
++
++	battery: battery@0 {
++		compatible = "simple-battery";
++		constant-charge-current-max-microamp = <2100000>;
++		voltage-min-design-microvolt = <3300000>;
++	};
++
++	ocp8178_backlight: backlight@0 {
++		compatible = "ocp8178-backlight";
++		backlight-control-gpios = <&gpio4 RK_PD6 GPIO_ACTIVE_HIGH>;
++		default-brightness = <5>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&backlight_control>;
++	};
++
++};
++
++&cpu_l0 {
++	cpu-supply = <&vdd_cpu_l>;
++};
++
++&cpu_l1 {
++	cpu-supply = <&vdd_cpu_l>;
++};
++
++&cpu_l2 {
++	cpu-supply = <&vdd_cpu_l>;
++};
++
++&cpu_l3 {
++	cpu-supply = <&vdd_cpu_l>;
++};
++
++&cpu_b0 {
++	cpu-supply = <&vdd_cpu_b>;
++};
++
++&cpu_b1 {
++	cpu-supply = <&vdd_cpu_b>;
++};
++
++&vopb {
++	status = "okay";
++};
++
++&vopb_mmu {
++	status = "okay";
++};
++
++&vopl {
++	status = "okay";
++};
++
++&vopl_mmu {
++	status = "okay";
++};
++
++&vpu {
++	status = "okay";
++	/* 0 means ion, 1 means drm */
++	//allocator = <0>;
++};
++
++&gpu {
++	status = "okay";
++	mali-supply = <&vdd_gpu>;
++};
++
++&rga {
++	status = "disabled";
++};
++
++&hdmi_in_vopb {
++	status = "okay";
++};
++
++&hdmi_in_vopl {
++	status = "disable";
++};
++
++&mipi_in_vopb {
++	status = "disable";
++};
++
++&mipi_in_vopl {
++	status = "okay";
++};
++
++&hdmi {
++	/* remove the hdmi_i2c_xfer */
++	pinctrl-0 = <&hdmi_cec>;
++	#address-cells = <1>;
++	#size-cells = <0>;
++	#sound-dai-cells = <0>;
++	status = "okay";
++	ddc-i2c-bus = <&i2c3>;
++	rockchip,defaultmode = <16>; /* CEA 1920x1080@60Hz */
++};
++
++&mipi_dsi {
++	status = "okay";
++
++	ports {
++		mipi_out: port@1 {
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			mipi_dsi_out: endpoint {
++				remote-endpoint = <&panel_in>;
++			};
++		};
++	};
++
++	dsi_panel: panel {
++		compatible = "cw,cwd686";
++		reg = <0>;
++		backlight = <&ocp8178_backlight>;
++		reset-gpios = <&gpio2 RK_PD4 GPIO_ACTIVE_HIGH>;
++		rotation = <90>;
++		dsi,lanes = <4>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&panel_reset>;
++		status = "okay";
++
++		port {
++			panel_in: endpoint {
++				remote-endpoint = <&mipi_dsi_out>;
++			};
++		};
++	};
++
++};
++
++&uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart0_xfer &uart0_cts &uart0_rts>;
++	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm4345c5";
++		clocks = <&rk808 1>;
++		clock-names = "lpo";
++		device-wakeup-gpios = <&gpio2 RK_PD2 GPIO_ACTIVE_HIGH>;
++		host-wakeup-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_HIGH>;
++		shutdown-gpios = <&gpio0 RK_PB1 GPIO_ACTIVE_HIGH>;
++		max-speed = <1500000>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&bt_host_wake &bt_wake &bt_reset>;
++	};
++
++};
++
++/*
++&uart2 {
++	status = "okay";
++};
++*/
++
++&i2c0 {
++	clock-frequency = <400000>;
++	i2c-scl-rising-time-ns = <168>;
++	i2c-scl-falling-time-ns = <4>;
++	status = "okay";
++
++	rk808: pmic@1b {
++		compatible = "rockchip,rk808";
++		reg = <0x1b>;
++		interrupt-parent = <&gpio1>;
++		interrupts = <21 IRQ_TYPE_LEVEL_LOW>;
++		#clock-cells = <1>;
++		clock-output-names = "xin32k", "rk808-clkout2";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pmic_int_l>;
++		wakeup-source;
++
++		vcc1-supply = <&vcc3v3_sys>;
++		vcc2-supply = <&vcc3v3_sys>;
++		vcc3-supply = <&vcc3v3_sys>;
++		vcc4-supply = <&vcc3v3_sys>;
++		vcc6-supply = <&vcc3v3_sys>;
++		vcc7-supply = <&vcc3v3_sys>;
++		vcc8-supply = <&vcc3v3_sys>;
++		vcc9-supply = <&vcc3v3_sys>;
++		vcc10-supply = <&vcc3v3_sys>;
++		vcc11-supply = <&vcc3v3_sys>;
++		vcc12-supply = <&vcc3v3_sys>;
++		vcc13-supply = <&vcc3v3_sys>;
++		vcc14-supply = <&vcc3v3_sys>;
++		vddio-supply = <&vcc_3v0>;
++
++		regulators {
++			vdd_center: DCDC_REG1 {
++				regulator-name = "vdd_center";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <750000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-ramp-delay = <6001>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vdd_cpu_l: DCDC_REG2 {
++				regulator-name = "vdd_cpu_l";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <750000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-ramp-delay = <6001>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc_ddr: DCDC_REG3 {
++				regulator-name = "vcc_ddr";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++				};
++			};
++
++			vcc1v8: vcc1v8_s3: vcca1v8_s3: DCDC_REG4 {
++				regulator-name = "vcc1v8";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1800000>;
++				};
++			};
++
++			vcc1v8_dvp: LDO_REG1 {
++				regulator-name = "vcc1v8_dvp";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc3v0_touch: LDO_REG2 {
++				regulator-name = "vcc3v0_touch";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <3000000>;
++				regulator-max-microvolt = <3000000>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc1v8_pmu: LDO_REG3 {
++				regulator-name = "vcc1v8_pmu";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1800000>;
++				};
++			};
++
++			vcc_sdio: LDO_REG4 {
++				regulator-name = "vcc_sdio";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <3000000>;
++				regulator-init-microvolt = <3000000>;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <3000000>;
++				};
++			};
++
++			vcca3v0_codec: LDO_REG5 {
++				regulator-name = "vcca3v0_codec";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <3000000>;
++				regulator-max-microvolt = <3000000>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc_1v5: LDO_REG6 {
++				regulator-name = "vcc_1v5";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1500000>;
++				regulator-max-microvolt = <1500000>;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1500000>;
++				};
++			};
++
++			vcca1v8_codec: LDO_REG7 {
++				regulator-name = "vcca1v8_codec";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc_3v0: LDO_REG8 {
++				regulator-name = "vcc_3v0";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-min-microvolt = <3000000>;
++				regulator-max-microvolt = <3000000>;
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <3000000>;
++				};
++			};
++
++			vcc3v3_s3: vcc_lan: SWITCH_REG1 {
++				regulator-name = "vcc3v3_s3";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vcc3v3_s0: SWITCH_REG2 {
++				regulator-name = "vcc3v3_s0";
++				regulator-always-on;
++				regulator-boot-on;
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++		};
++	};
++
++	vdd_cpu_b: regulator@40 {
++		compatible = "silergy,syr827";
++		reg = <0x40>;
++		fcs,suspend-voltage-selector = <1>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&vsel1_gpio>;
++		vsel-gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
++		regulator-compatible = "fan53555-reg";
++		regulator-name = "vdd_cpu_b";
++		regulator-min-microvolt = <712500>;
++		regulator-max-microvolt = <1500000>;
++		regulator-ramp-delay = <1000>;
++		regulator-always-on;
++		regulator-boot-on;
++		vin-supply = <&vcc3v3_sys>;
++
++		regulator-state-mem {
++			regulator-off-in-suspend;
++		};
++	};
++
++	vdd_gpu: regulator@41 {
++		compatible = "silergy,syr828";
++		reg = <0x41>;
++		fcs,suspend-voltage-selector = <1>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&vsel2_gpio>;
++		vsel-gpios = <&gpio1 RK_PB6 GPIO_ACTIVE_HIGH>;
++		regulator-compatible = "fan53555-reg";
++		regulator-name = "vdd_gpu";
++		regulator-min-microvolt = <712500>;
++		regulator-max-microvolt = <1500000>;
++		regulator-ramp-delay = <1000>;
++		regulator-always-on;
++		regulator-boot-on;
++		vin-supply = <&vcc3v3_sys>;
++
++		regulator-state-mem {
++			regulator-off-in-suspend;
++		};
++	};
++};
++
++&i2c1 {
++	status = "okay";
++	i2c-scl-rising-time-ns = <300>;
++	i2c-scl-falling-time-ns = <15>;
++
++	es8388: es8388@11 {
++		compatible = "everest,es8388", "everest,es8328";
++		status = "okay";
++		reg = <0x11>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&audio_switch>;
++		DVDD-supply = <&vcca1v8_codec>;
++		AVDD-supply = <&vcca3v0_codec>;
++		HPVDD-supply = <&vcca3v0_codec>;
++		PVDD-supply = <&vcca1v8_codec>;
++		clock-names = "mclk";
++		clocks = <&cru SCLK_I2S_8CH_OUT>;
++		#sound-dai-cells = <0>;
++	};
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&i2c3 {
++	status = "okay";
++};
++
++&i2c5 {
++	status = "okay";
++	i2c-scl-rising-time-ns = <300>;
++	i2c-scl-falling-time-ns = <15>;
++
++	axp22x: pmic@34 {
++		interrupt-controller;
++		#interrupt-cells = <1>;
++		compatible = "x-powers,axp221";
++		reg = <0x34>;
++		interrupt-parent = <&gpio3>;
++		interrupts = <8 8>;
++		irq-gpios = <&gpio3 8 0>;
++
++		regulators {
++
++			x-powers,dcdc-freq = <3000>;
++
++			reg_aldo1: aldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "audio-vdd";
++			};
++
++			reg_aldo2: aldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "display-vcc";
++			};
++
++			reg_aldo3: aldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-name = "wifi-vdd";
++			};
++
++			reg_dldo1: dldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc1";
++			};
++
++			reg_dldo2: dldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo2";
++			};
++
++			reg_dldo3: dldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo3";
++			};
++
++			reg_dldo4: dldo4 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "dldo4";
++			};
++
++			reg_eldo1: eldo1 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc2";
++			};
++
++			reg_eldo2: eldo2 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc3";
++			};
++
++			reg_eldo3: eldo3 {
++				regulator-always-on;
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-name = "wifi-vcc4";
++			};
++
++		};
++
++		battery_power_supply: battery-power-supply {
++			compatible = "x-powers,axp221-battery-power-supply";
++			monitored-battery = <&battery>;
++		};
++
++		ac_power_supply: ac_power_supply {
++			compatible = "x-powers,axp221-ac-power-supply";
++		};
++
++	};
++};
++
++&spi4 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi4_clk &spi4_tx>;
++
++	spidev0: spidev@0 {
++		status = "disabled";
++	};
++
++	printer0: printer@0 {
++		compatible = "clockworkpi-a06,printer-mtp02";
++		reg = <0>;
++		spi-max-frequency = <4500000>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&printer_pinmux>;
++
++		latch-gpio = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
++		strobe-gpio = <&gpio3 RK_PA7 GPIO_ACTIVE_HIGH>;
++
++		pa-gpio =  <&gpio3 RK_PC0 GPIO_ACTIVE_HIGH>;
++		pan-gpio = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
++		pb-gpio =  <&gpio3 RK_PB5 GPIO_ACTIVE_HIGH>;
++		pbn-gpio = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;
++
++		pwr-gpio = <&gpio3 RK_PA3 GPIO_ACTIVE_HIGH>;
++		pap-gpio = <&gpio3 RK_PA4 GPIO_ACTIVE_HIGH>;
++
++		close-feed = <230>;
++
++		status = "okay";
++	};
++};
++
++/* <4 RK_PA0 &pcfg_pull_none> is used as i2s_8ch_mclk_pin */
++&i2s0_8ch_bus {
++	rockchip,pins =
++		<3 RK_PD0 1 &pcfg_pull_none>,
++		<3 RK_PD1 1 &pcfg_pull_none>,
++		<3 RK_PD2 1 &pcfg_pull_none>,
++		<3 RK_PD3 1 &pcfg_pull_none>,
++		<3 RK_PD4 1 &pcfg_pull_none>,
++		<3 RK_PD5 1 &pcfg_pull_none>,
++		<3 RK_PD6 1 &pcfg_pull_none>,
++		<3 RK_PD7 1 &pcfg_pull_none>;
++};
++
++&i2s0 {
++	rockchip,i2s-broken-burst-len;
++	rockchip,playback-channels = <8>;
++	rockchip,capture-channels = <8>;
++	pinctrl-0 = <&i2s0_2ch_bus>;
++	status = "okay";
++};
++
++&i2s1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2s_8ch_mclk_pin>, <&i2s1_2ch_bus>;
++	rockchip,playback-channels = <2>;
++	rockchip,capture-channels = <2>;
++	#sound-dai-cells = <0>;
++	status = "okay";
++};
++
++&i2s2 {
++	#sound-dai-cells = <0>;
++	status = "okay";
++};
++
++&io_domains {
++	status = "okay";
++
++	bt656-supply = <&vcc1v8_dvp>;		/* bt656_gpio2ab_ms */
++	audio-supply = <&vcca1v8_codec>;	/* audio_gpio3d4a_ms */
++	sdmmc-supply = <&vcc_sdio>;		/* sdmmc_gpio4b_ms */
++	gpio1830-supply = <&vcc_3v0>;		/* gpio1833_gpio4cd_ms */
++};
++
++&pmu_io_domains {
++	status = "okay";
++	pmu1830-supply = <&vcc_3v0>;
++};
++
++&sdio0 {
++	clock-frequency = <50000000>;
++	clock-freq-min-max = <200000 50000000>;
++	supports-sdio;
++	bus-width = <4>;
++	disable-wp;
++	cap-sd-highspeed;
++	cap-sdio-irq;
++	keep-power-in-suspend;
++	mmc-pwrseq = <&sdio_pwrseq>;
++	non-removable;
++	num-slots = <1>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&sdio0_bus4 &sdio0_cmd &sdio0_clk>;
++	sd-uhs-sdr104;
++	status = "okay";
++};
++
++&sdmmc {
++	bus-width = <4>;
++	cap-sd-highspeed;
++	cap-mmc-highspeed;
++	cd-gpios = <&gpio0 RK_PA7 GPIO_ACTIVE_LOW>;
++	disable-wp;
++	max-frequency = <150000000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc0_det_l>;
++//	sd-uhs-sdr104;
++	vmmc-supply = <&vcc3v0_sd>;
++	vqmmc-supply = <&vcc_sdio>;
++	status = "okay";
++};
++
++&tsadc {
++	/* tshut mode 0:CRU 1:GPIO */
++	rockchip,hw-tshut-mode = <1>;
++	/* tshut polarity 0:LOW 1:HIGH */
++	rockchip,hw-tshut-polarity = <1>;
++	status = "okay";
++};
++
++&tcphy0 {
++	status = "okay";
++};
++
++&tcphy1 {
++	status = "okay";
++};
++
++&u2phy0 {
++	status = "okay";
++
++	u2phy0_otg: otg-port {
++		status = "okay";
++	};
++
++	u2phy0_host: host-port {
++		phy-supply = <&usb3_vbus>;
++		status = "okay";
++	};
++};
++
++&u2phy1 {
++	status = "okay";
++
++	u2phy1_otg: otg-port {
++		status = "okay";
++	};
++
++	u2phy1_host: host-port {
++		phy-supply = <&usb_vbus>;
++		status = "okay";
++	};
++};
++
++&usbdrd3_0 {
++	status = "okay";
++};
++
++&usbdrd3_1 {
++	status = "okay";
++};
++
++&usbdrd_dwc3_0 {
++	status = "okay";
++};
++
++&usbdrd_dwc3_1 {
++	status = "okay";
++	dr_mode = "host";
++};
++
++&usb_host0_ehci {
++	status = "okay";
++};
++
++&usb_host0_ohci {
++	status = "okay";
++};
++
++&usb_host1_ehci {
++	status = "okay";
++};
++
++&usb_host1_ohci {
++	status = "okay";
++};
++
++&pinctrl {
++
++	hdmi {
++		/delete-node/ hdmi-i2c-xfer;
++	};
++
++	i2s1 {
++		i2s_8ch_mclk_pin: i2s-8ch-mclk-pin {
++			rockchip,pins = <4 RK_PA0 1 &pcfg_pull_none>;
++		};
++	};
++
++	pmic {
++		pmic_int_l: pmic-int-l {
++			rockchip,pins = <1 RK_PC5 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++
++		vsel1_gpio: vsel1-gpio {
++			rockchip,pins = <1 RK_PC1 RK_FUNC_GPIO &pcfg_pull_down>;
++		};
++
++		vsel2_gpio: vsel2-gpio {
++			rockchip,pins = <1 RK_PB6 RK_FUNC_GPIO &pcfg_pull_down>;
++		};
++	};
++
++	sdmmc {
++		sdmmc0_det_l: sdmmc0-det-l {
++			rockchip,pins = <0 RK_PA7 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++
++		sdmmc0_pwr_h: sdmmc0-pwr-h {
++			rockchip,pins = <0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++	};
++
++	sdio-pwrseq {
++		wifi_enable_h: wifi-enable-h {
++			rockchip,pins = <0 10 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	wireless-bluetooth {
++		uart0_gpios: uart0-gpios {
++			rockchip,pins = <2 19 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	rockchip-key {
++		power_key: power-key {
++			rockchip,pins = <0 5 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++	};
++
++	spi1 {
++		spi1_gpio: spi1-gpio {
++			rockchip,pins =
++				<1 7 RK_FUNC_GPIO &pcfg_output_low>,
++				<1 8 RK_FUNC_GPIO &pcfg_output_low>,
++				<1 9 RK_FUNC_GPIO &pcfg_output_low>,
++				<1 10 RK_FUNC_GPIO &pcfg_output_low>;
++		};
++	};
++
++	bt {
++		bt_host_wake: bt-host-wake {
++			rockchip,pins = <0 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		bt_reset: bt-reset {
++			rockchip,pins = <0 RK_PB1 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		bt_wake: bt-wake {
++			rockchip,pins = <2 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	panel {
++		panel_reset: panel-reset {
++			rockchip,pins = <2 RK_PD4 RK_FUNC_GPIO &pcfg_output_low>;
++		};
++	};
++
++	backlight {
++		backlight_control: backlight-control {
++			rockchip,pins = <4 RK_PD6 RK_FUNC_GPIO &pcfg_output_low>;
++		};
++	};
++
++	audio {
++		audio_switch: audio-switch {
++			rockchip,pins = <4 RK_PD3 RK_FUNC_GPIO &pcfg_output_high>;
++		};
++
++		hp_det: hp-det {
++			rockchip,pins = <4 RK_PD4 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		pa_en: pa-en {
++			rockchip,pins = <3 RK_PB1 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	printer {
++		printer_pinmux: printer-pinmux {
++			rockchip,pins =
++				<3 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>, //latch
++				<3 RK_PA7 RK_FUNC_GPIO &pcfg_pull_none>, //strobe
++				<3 RK_PC0 RK_FUNC_GPIO &pcfg_pull_none>, //PA
++				<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_none>, //PNA
++				<3 RK_PB5 RK_FUNC_GPIO &pcfg_pull_none>, //PB
++				<4 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>, //PNB
++				<3 RK_PA3 RK_FUNC_GPIO &pcfg_pull_none>, //power
++				<3 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>; //paper
++		};
++	};
++};
+diff --git a/drivers/spi/Makefile b/drivers/spi/Makefile
+index 699db95c8441..3aeeddaeb70e 100644
+--- a/drivers/spi/Makefile
++++ b/drivers/spi/Makefile
+@@ -71,6 +71,7 @@ obj-$(CONFIG_SPI_MPC52xx)		+= spi-mpc52xx.o
+ obj-$(CONFIG_SPI_MT65XX)                += spi-mt65xx.o
+ obj-$(CONFIG_SPI_MT7621)		+= spi-mt7621.o
+ obj-$(CONFIG_SPI_MTK_NOR)		+= spi-mtk-nor.o
++obj-$(CONFIG_SPI_MTP02)		+= spi-mtp02.o
+ obj-$(CONFIG_SPI_MXIC)			+= spi-mxic.o
+ obj-$(CONFIG_SPI_MXS)			+= spi-mxs.o
+ obj-$(CONFIG_SPI_NPCM_FIU)		+= spi-npcm-fiu.o
+diff --git a/drivers/spi/spi-mtp02.c b/drivers/spi/spi-mtp02.c
+new file mode 100644
+index 000000000000..8c0b5e493f67
+--- /dev/null
++++ b/drivers/spi/spi-mtp02.c
+@@ -0,0 +1,777 @@
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/cdev.h>
++#include <linux/device.h>
++#include <linux/kernel.h>
++#include <linux/uaccess.h>
++#include <linux/fs.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/spi/spi.h>
++#include <linux/delay.h>
++#include <linux/pinctrl/consumer.h>
++#include <linux/gpio/consumer.h>
++#include <linux/device.h>
++
++#include "spi-mtp02.h"
++
++#define MAX_DEV BIT((MINORBITS-1)) /* ... up to 128 */
++
++struct mtp02_device {
++	/* device handling related values */
++	dev_t			devt;
++	dev_t			cups_devt;
++	int			minor;
++	struct device		*dev;
++	struct device		*cups_dev;
++	struct cdev		*cdev;
++	struct cdev		*cups_cdev;
++	struct spi_device	*spi;
++
++	struct pinctrl *pinctrl;
++
++	struct gpio_desc	*latch_gpio;
++	struct gpio_desc	*strobe_gpio;
++
++	struct gpio_desc	*pa_gpio;
++	struct gpio_desc	*pan_gpio;
++	struct gpio_desc	*pb_gpio;
++	struct gpio_desc	*pbn_gpio;
++
++	struct gpio_desc	*pwr_gpio;
++	struct gpio_desc	*pap_gpio;
++
++	int pa_step;
++	int feed_time;
++	uint8_t temp[48];
++	int byte_in_line;
++	int default_close_feed;
++	int default_burnatonce;
++	struct mtp02_settings settings;
++	atomic_t used;
++
++	uint32_t cups_ras_magic;
++	uint8_t cups_page_header[1796];
++	uint32_t cups_lines_left;
++	uint32_t cups_advance;
++	enum {
++		CUPS_MAGIC,
++		CUPS_HEADER,
++		CUPS_LINE,
++	} cups_state;
++
++};
++
++static dev_t mtp02_dev = 0;
++static DEFINE_IDR(mtp02_idr);
++static DEFINE_MUTEX(minor_lock); /* Protect idr accesses */
++
++static struct class *mtp02_class = NULL;
++
++static int mtp02_uevent(struct device *dev, struct kobj_uevent_env *env)
++{
++	add_uevent_var(env, "DEVMODE=%#o", 0666);
++	return 0;
++}
++
++static const struct {
++	bool pa;
++	bool pan;
++	bool pb;
++	bool pbn;
++} steps[] =
++{
++		{0,1,0,1},
++		{0,1,1,0},
++		{1,0,1,0},
++		{1,0,0,1},
++		{0,0,0,0},
++};
++
++static void mtp02_step_setup(struct mtp02_device * device, int step)
++{
++	gpiod_set_value(device->pa_gpio,steps[step].pa);
++	gpiod_set_value(device->pan_gpio,steps[step].pan);
++	gpiod_set_value(device->pb_gpio,steps[step].pb);
++	gpiod_set_value(device->pbn_gpio,steps[step].pbn);
++
++}
++
++static bool mtp02_is_paper(struct mtp02_device * device)
++{
++	return !(gpiod_get_value(device->pap_gpio));
++}
++
++static void mtp02_step(struct mtp02_device * device, int steps)
++{
++	int i;
++	if(steps>0)
++	{
++		for(i=0;i<steps;i++)
++		{
++			device->pa_step = (device->pa_step +1)%4;
++			mtp02_step_setup(device,device->pa_step);
++			msleep(device->feed_time);
++		}
++	}
++	else
++	{
++		for(i=steps;i>0;i--)
++		{
++			device->pa_step = (device->pa_step -1)%4;
++			mtp02_step_setup(device,device->pa_step);
++			msleep(device->feed_time);
++		}
++	}
++	mtp02_step_setup(device,4);
++}
++
++static int mtp02_open(struct inode *inode, struct file *file)
++{
++	struct mtp02_device	*device;
++
++	mutex_lock(&minor_lock);
++	device = idr_find(&mtp02_idr, iminor(inode));
++	mutex_unlock(&minor_lock);
++	if (!device) {
++		pr_debug("device: minor %d unknown.\n", iminor(inode));
++		return -ENODEV;
++	}
++	if(atomic_cmpxchg(&device->used,0,1))
++		return -EBUSY;
++
++	file->private_data = device;
++
++	gpiod_set_value(device->pwr_gpio,1);
++	mtp02_step(device,0);
++	device->byte_in_line = 0;
++
++	device->settings.close_feed = device->default_close_feed;
++	device->settings.line_feed = 2;
++	device->settings.burn_time = 250;
++	device->settings.burn_count = 10;
++	device->settings.bytesatonce = device->default_burnatonce;
++
++	printk("mtp02: Device open\n");
++
++	if(!mtp02_is_paper(device))
++	{
++		gpiod_set_value(device->pwr_gpio,0);
++		atomic_set(&device->used,0);
++		return -EBUSY;
++	}
++
++	return 0;
++}
++
++static int mtp02_cups_open(struct inode *inode, struct file *file)
++{
++	struct mtp02_device	*device;
++
++	mutex_lock(&minor_lock);
++	device = idr_find(&mtp02_idr, iminor(inode)-MAX_DEV);
++	mutex_unlock(&minor_lock);
++	if (!device) {
++		pr_debug("device: minor %d unknown.\n", iminor(inode));
++		return -ENODEV;
++	}
++	if(atomic_cmpxchg(&device->used,0,1))
++		return -EBUSY;
++
++	file->private_data = device;
++
++	gpiod_set_value(device->pwr_gpio,1);
++	mtp02_step(device,0);
++	device->byte_in_line = 0;
++
++	device->settings.close_feed = device->default_close_feed;
++	device->settings.line_feed = 2;
++	device->settings.burn_time = 250;
++	device->settings.burn_count = 10;
++	device->settings.bytesatonce = device->default_burnatonce;
++
++	device->cups_state = CUPS_MAGIC;
++	device->cups_advance = 0;
++
++	if(!mtp02_is_paper(device))
++	{
++		gpiod_set_value(device->pwr_gpio,0);
++		atomic_set(&device->used,0);
++		return -EBUSY;
++	}
++
++	return 0;
++}
++
++static int mtp02_release(struct inode *inode, struct file *file)
++{
++	struct mtp02_device * device = file->private_data;
++
++	mtp02_step(device, device->settings.close_feed);
++
++	gpiod_set_value(device->pwr_gpio,0);
++
++	atomic_set(&device->used,0);
++	printk("mtp02: Device close\n");
++	return 0;
++}
++
++static int mtp02_cups_release(struct inode *inode, struct file *file)
++{
++	struct mtp02_device * device = file->private_data;
++
++	if(device->cups_advance == 2)
++		mtp02_step(device, device->settings.close_feed);
++
++	gpiod_set_value(device->pwr_gpio,0);
++
++	atomic_set(&device->used,0);
++	return 0;
++}
++
++static long mtp02_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
++{
++	struct mtp02_device * device = file->private_data;
++
++	if(!mtp02_is_paper(device))
++	{
++		return -EBUSY;
++	}
++	switch(cmd){
++	case MTP02_FEED:
++		mtp02_step(device, (int)arg);
++		break;
++	case MTP02_GET_SETTINGS:
++	{
++		int ret = copy_to_user((void __user *)arg,&device->settings, sizeof(device->settings));
++		if(ret < 0){
++			printk("Error in MTP02_GET_SETTINGS\n");
++			return -1;
++		}
++		break;
++	}
++	case MTP02_SET_SETTINGS:
++	{
++		int ret = copy_from_user(&device->settings, (void __user *)arg, sizeof(device->settings));
++		if(ret < 0){
++			printk("Error in MTP02_SET_SETTINGS\n");
++			return -1;
++		}
++		break;
++	}
++	default :
++		return -ENOTTY;
++	}
++	return 0;
++}
++
++static void mtp02_burn(struct mtp02_device *device,uint8_t *buf)
++{
++	spi_write(device->spi,buf,48);
++	ndelay(25);
++	gpiod_set_value(device->latch_gpio,1);
++	ndelay(25);
++	gpiod_set_value(device->latch_gpio,0);
++	ndelay(25);
++	{
++		int i;
++		int burn_count = device->settings.burn_count;
++		for(i=0;i<burn_count;i++)
++		{
++			gpiod_set_value(device->strobe_gpio,1);
++			udelay(device->settings.burn_time);
++			gpiod_set_value(device->strobe_gpio,0);
++			udelay(14);
++		}
++	}
++}
++
++static void mtp02_burn_segmented(struct mtp02_device *device,uint8_t *buf)
++{
++	uint8_t tmpbuf[48];
++	int i;
++	for(i=0;i<48;i+=device->settings.bytesatonce)
++	{
++		int bytes = min(48-i,device->settings.bytesatonce);
++		memset(tmpbuf,0,48);
++		memcpy(&tmpbuf[i],&buf[i],bytes);
++		mtp02_burn(device,tmpbuf);
++	}
++}
++
++static ssize_t mtp02_write(struct file *file, const char __user *buf, size_t count, loff_t *offset)
++{
++	struct mtp02_device * device = file->private_data;
++	int maxbytes; /* maximum bytes that can be read from ppos to BUFFER_SIZE*/
++	int bytes_to_write; /* gives the number of bytes to write*/
++	int bytes_writen; /* number of bytes actually writen*/
++
++	if(!mtp02_is_paper(device))
++	{
++		return -EBUSY;
++	}
++
++	maxbytes = 48 - device->byte_in_line;
++	if (maxbytes > count)
++		bytes_to_write = count;
++	else
++		bytes_to_write = maxbytes;
++	bytes_writen = bytes_to_write - copy_from_user(&device->temp[device->byte_in_line], buf, bytes_to_write);
++	*offset += bytes_writen;
++	device->byte_in_line+=bytes_writen;
++	if(device->byte_in_line == 48)
++	{
++		mtp02_burn_segmented(device,device->temp);
++		mtp02_step(device,device->settings.line_feed);
++		device->byte_in_line=0;
++	}
++	return bytes_writen;
++}
++
++static ssize_t mtp02_cups_write(struct file *file, const char __user *buf, size_t count, loff_t *offset)
++{
++	struct mtp02_device * device = file->private_data;
++	int maxbytes; /* maximum bytes that can be read from ppos to BUFFER_SIZE*/
++	int bytes_to_write; /* gives the number of bytes to write*/
++	int bytes_writen; /* number of bytes actually writen*/
++
++	int fullline;
++	uint8_t *buff;
++
++	if(!mtp02_is_paper(device))
++	{
++		return -EBUSY;
++	}
++
++
++
++	switch(device->cups_state)
++	{
++		case CUPS_MAGIC:
++			fullline = 4;
++			buff = (uint8_t*)&device->cups_ras_magic;
++			break;
++		case CUPS_HEADER:
++			fullline = 1796;
++			buff = device->cups_page_header;
++			break;
++		case CUPS_LINE:
++			fullline = 48;
++			buff = device->temp;
++			break;
++	}
++	maxbytes = fullline - device->byte_in_line;
++	if (maxbytes > count)
++		bytes_to_write = count;
++	else
++		bytes_to_write = maxbytes;
++	bytes_writen = bytes_to_write - copy_from_user(&buff[device->byte_in_line], buf, bytes_to_write);
++	*offset += bytes_writen;
++	device->byte_in_line+=bytes_writen;
++	if(device->byte_in_line == fullline)
++	{
++		switch(device->cups_state)
++		{
++		case CUPS_MAGIC:
++			if(device->cups_ras_magic == 0x52615333) // RaS3
++				device->cups_state = CUPS_HEADER;
++			else
++				return -EINVAL;
++			break;
++		case CUPS_HEADER:
++			{
++				uint32_t lines;
++				uint32_t advance_lines;
++				uint32_t width;
++				memcpy(&lines,&device->cups_page_header[376],4);
++				memcpy(&advance_lines,&device->cups_page_header[256],4);
++				memcpy(&width,&device->cups_page_header[372],4);
++				if(width != 384)
++					return -EINVAL;
++				memcpy(&device->cups_advance,&device->cups_page_header[260],4);
++				device->settings.close_feed = advance_lines*2;
++				device->cups_lines_left = lines;
++				device->cups_state = CUPS_LINE;
++				break;
++			}
++		case CUPS_LINE:
++			{
++				mtp02_burn_segmented(device,device->temp);
++				mtp02_step(device,device->settings.line_feed);
++			if(--device->cups_lines_left == 0)
++			{
++				device->cups_state = CUPS_HEADER;
++				if(device->cups_advance == 4)
++					mtp02_step(device, device->settings.close_feed);
++			}
++			break;
++			}
++		}
++		device->byte_in_line=0;
++	}
++	return bytes_writen;
++}
++
++static int import_gpio_out(struct mtp02_device *device, struct gpio_desc ** gpio, const char* name, enum gpiod_flags flags)
++{
++	*gpio = devm_gpiod_get(&device->spi->dev, name, flags);
++	if (IS_ERR(*gpio))
++		return PTR_ERR(*gpio);
++	gpiod_unexport(*gpio);
++	return gpiod_direction_output(*gpio,0);
++}
++
++static int setup_gpio(struct mtp02_device *device)
++{
++	int retval;
++	retval = import_gpio_out(device,&device->latch_gpio,"latch", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->strobe_gpio,"strobe", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->pa_gpio,"pa", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->pan_gpio,"pan", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->pb_gpio,"pb", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->pbn_gpio,"pbn", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	retval = import_gpio_out(device,&device->pwr_gpio,"pwr", GPIOD_OUT_LOW);
++	if (retval) return retval;
++	device->pap_gpio = devm_gpiod_get(&device->spi->dev, "pap", GPIOD_IN);
++	if (IS_ERR(device->pap_gpio))
++		return PTR_ERR(device->pap_gpio);
++	gpiod_unexport(device->pap_gpio);
++	retval = gpiod_direction_input(device->pap_gpio);
++	return retval;
++}
++
++static int mtp02_get_minor(struct mtp02_device *device)
++{
++	int retval = -ENOMEM;
++
++	mutex_lock(&minor_lock);
++	retval = idr_alloc(&mtp02_idr, device, 0, MAX_DEV, GFP_KERNEL);
++	if (retval >= 0) {
++		device->minor = retval;
++		retval = 0;
++	} else if (retval == -ENOSPC) {
++		dev_err(&device->spi->dev, "too many mtp02 devices\n");
++		retval = -EINVAL;
++	}
++	mutex_unlock(&minor_lock);
++	return retval;
++}
++
++static void mtp02_free_minor(struct mtp02_device *dev)
++{
++	mutex_lock(&minor_lock);
++	idr_remove(&mtp02_idr, dev->minor);
++	mutex_unlock(&minor_lock);
++}
++
++static const struct file_operations mtp02_fops = {
++		.owner      = THIS_MODULE,
++		.open       = mtp02_open,
++		.release    = mtp02_release,
++		.unlocked_ioctl = mtp02_ioctl,
++		.write       = mtp02_write
++};
++
++static const struct file_operations mtp02_cups_fops = {
++		.owner      = THIS_MODULE,
++		.open       = mtp02_cups_open,
++		.release    = mtp02_cups_release,
++		.write       = mtp02_cups_write
++};
++
++static ssize_t int_show(struct device *dev, struct device_attribute *attr,
++		char *buf)
++{
++	struct mtp02_device *device = dev_get_drvdata(dev);
++	if (strcmp("feed_time",attr->attr.name)==0)
++		return scnprintf(buf, PAGE_SIZE, "%d\n", device->feed_time);
++	else if (strcmp("burnatonce",attr->attr.name)==0)
++		return scnprintf(buf, PAGE_SIZE, "%d\n", device->default_burnatonce);
++	else
++		return -EINVAL;
++}
++
++static ssize_t int_store(struct device *dev,
++		struct device_attribute *attr,
++		const char *buf, size_t len)
++{
++	struct mtp02_device *device = dev_get_drvdata(dev);
++	unsigned long val;
++	char *endp;
++	val = simple_strtoul(buf, &endp, 0);
++	if (buf == endp)
++		return -EINVAL;
++
++	if (strcmp("feed_time",attr->attr.name)==0)
++		device->feed_time = val;
++	else if (strcmp("burnatonce",attr->attr.name)==0)
++		device->default_burnatonce = val;
++	else
++		return -EINVAL;
++	return len;
++}
++
++static DEVICE_ATTR(feed_time, 0644, int_show, int_store);
++static DEVICE_ATTR(burnatonce, 0644, int_show, int_store);
++
++
++static int mtp02_probe(struct spi_device *spi)
++{
++	struct mtp02_device	*device;
++	int			retval;
++
++	/* setup spi parameters */
++	spi->mode = 0x00;
++	spi->bits_per_word = 8;
++
++	retval = spi_setup(spi);
++	if (retval) {
++		dev_dbg(&spi->dev, "configuration of SPI interface failed!\n");
++		return retval;
++	}
++
++	dev_dbg(&spi->dev,
++			"spi interface setup: mode 0x%2x, %d bits per word, %dhz max speed",
++			spi->mode, spi->bits_per_word, spi->max_speed_hz);
++
++	/* Allocate driver data */
++	device = kzalloc(sizeof(*device), GFP_KERNEL);
++	if (!device)
++		return -ENOMEM;
++
++	if(device_create_file(&spi->dev, &dev_attr_feed_time))
++		goto create_file_failed;
++	if(device_create_file(&spi->dev, &dev_attr_burnatonce))
++		goto create_file_failed2;
++
++	/* Initialize the driver data */
++	device->spi = spi;
++	device->feed_time = 6;
++	device->default_burnatonce=6;
++
++	device->pinctrl = devm_pinctrl_get_select_default(&spi->dev);
++	if (IS_ERR(device->pinctrl)) {
++		dev_dbg(&spi->dev, "setup of PINMUX failed");
++		goto GPIO_failed;
++	}
++
++	/* setup GPIO */
++	retval = setup_gpio(device);
++	if (retval) {
++		dev_dbg(&spi->dev, "setup of GPIOs failed");
++		goto GPIO_failed;
++	}
++
++	retval = device_property_read_u32(&spi->dev, "close-feed",
++			&device->default_close_feed);
++	if (retval) {
++		dev_dbg(&spi->dev, "close-feed error");
++		goto GPIO_failed;
++	}
++
++	/* determ minor number */
++	retval = mtp02_get_minor(device);
++	if (retval) {
++		dev_dbg(&spi->dev, "get of minor number failed");
++		goto minor_failed;
++	}
++
++	/* create device */
++	device->devt = MKDEV(MAJOR(mtp02_dev), device->minor);
++	device->dev = device_create(mtp02_class,
++			&spi->dev,
++			device->devt,
++			device,
++			"mtp02.%d",
++			device->minor);
++	if (IS_ERR(device->dev)) {
++		pr_err("mtp02: device register failed\n");
++		retval = PTR_ERR(device->dev);
++		goto device_create_failed;
++	} else {
++		dev_dbg(device->dev,
++				"created device for major %d, minor %d\n",
++				MAJOR(mtp02_dev),
++				device->minor);
++	}
++
++	/* create cdev */
++	device->cdev = cdev_alloc();
++	if (!device->cdev) {
++		dev_dbg(device->dev, "allocation of cdev failed");
++		retval = -ENOMEM;
++		goto cdev_failed;
++	}
++	device->cdev->owner = THIS_MODULE;
++	cdev_init(device->cdev, &mtp02_fops);
++	retval = cdev_add(device->cdev, device->devt, 1);
++	if (retval) {
++		dev_dbg(device->dev, "register of cdev failed");
++		goto del_cdev;
++	}
++
++	device->cups_devt = MKDEV(MAJOR(mtp02_dev), device->minor+MAX_DEV);
++	device->cups_dev = device_create(mtp02_class,
++			&spi->dev,
++			device->cups_devt,
++			device,
++			"mtp02.%d_cups",
++			device->minor);
++	if (IS_ERR(device->cups_dev)) {
++		pr_err("mtp02: device register failed\n");
++		retval = PTR_ERR(device->dev);
++		goto cups_device_create_failed;
++	} else {
++		dev_dbg(device->cups_dev,
++				"created device for major %d, minor %d\n",
++				MAJOR(mtp02_dev),
++				device->minor);
++	}
++
++	/* create cdev */
++	device->cups_cdev = cdev_alloc();
++	if (!device->cups_cdev) {
++		dev_dbg(device->cups_dev, "allocation of cdev failed");
++		retval = -ENOMEM;
++		goto cups_cdev_failed;
++	}
++	device->cups_cdev->owner = THIS_MODULE;
++	cdev_init(device->cups_cdev, &mtp02_cups_fops);
++	retval = cdev_add(device->cups_cdev, device->cups_devt, 1);
++	if (retval) {
++		dev_dbg(device->dev, "register of cdev failed");
++		goto del_cups_cdev;
++	}
++
++	/* spi setup */
++	spi_set_drvdata(spi, device);
++
++	return 0;
++
++	del_cups_cdev:
++	cdev_del(device->cups_cdev);
++	cups_cdev_failed:
++	device_destroy(mtp02_class, device->cups_devt);
++	cups_device_create_failed:
++
++	del_cdev:
++	cdev_del(device->cdev);
++	cdev_failed:
++	device_destroy(mtp02_class, device->devt);
++	device_create_failed:
++	mtp02_free_minor(device);
++	minor_failed:
++	GPIO_failed:
++	device_remove_file(&spi->dev, &dev_attr_burnatonce);
++	create_file_failed2:
++	device_remove_file(&spi->dev, &dev_attr_feed_time);
++	create_file_failed:
++	kfree(device);
++
++	return retval;
++}
++
++static int mtp02_remove(struct spi_device *spi)
++{
++	struct mtp02_device	*device = spi_get_drvdata(spi);
++
++	/* make sure ops on existing fds can abort cleanly */
++	device->spi = NULL;
++
++	device_destroy(mtp02_class, device->devt);
++	device_destroy(mtp02_class, device->cups_devt);
++
++	cdev_del(device->cdev);
++	cdev_del(device->cups_cdev);
++
++	mtp02_free_minor(device);
++
++	device_remove_file(&spi->dev, &dev_attr_burnatonce);
++	device_remove_file(&spi->dev, &dev_attr_feed_time);
++
++	kfree(device);
++
++	return 0;
++}
++
++static const struct of_device_id mtp02_dt_ids[] = {
++		{ .compatible = "devterm,printer-mtp02" },
++		{},
++};
++
++MODULE_DEVICE_TABLE(of, mtp02_dt_ids);
++
++static const struct spi_device_id mtp02_device_id[] = {
++		{ "printer-mtp02", 0 },
++		{ }
++};
++MODULE_DEVICE_TABLE(spi, mtp02_device_id);
++
++static struct spi_driver mtp02_spi_driver = {
++		.driver = {
++				.name =		"mtp02",
++				.owner =	THIS_MODULE,
++				.of_match_table = of_match_ptr(mtp02_dt_ids),
++		},
++		.id_table = mtp02_device_id,
++		.probe =	mtp02_probe,
++		.remove =	mtp02_remove,
++
++		/*
++		 * NOTE:  suspend/resume methods are not necessary here.
++		 * We don't do anything except pass the requests to/from
++		 * the underlying controller.  The refrigerator handles
++		 * most issues; the controller driver handles the rest.
++		 */
++};
++
++
++static int __init mtp02_init(void)
++{
++	int status;
++
++	/*
++	 * Claim device numbers.  Then register a class
++	 * that will key udev/mdev to add/remove /dev nodes.  Last, register
++	 * Last, register the driver which manages those device numbers.
++	 */
++	status = alloc_chrdev_region(&mtp02_dev, 0, MAX_DEV, "mtp02");
++	if (status < 0)
++		return status;
++
++	mtp02_class = class_create(THIS_MODULE, "mtp02");
++	if (IS_ERR(mtp02_class)) {
++		unregister_chrdev(MAJOR(mtp02_dev),
++				mtp02_spi_driver.driver.name);
++		return PTR_ERR(mtp02_class);
++	}
++	mtp02_class->dev_uevent = mtp02_uevent;
++
++	status = spi_register_driver(&mtp02_spi_driver);
++	if (status < 0) {
++		class_destroy(mtp02_class);
++		unregister_chrdev(MAJOR(mtp02_dev),
++				mtp02_spi_driver.driver.name);
++	}
++
++	return status;
++}
++
++static void __exit mtp02_exit(void)
++{
++	spi_unregister_driver(&mtp02_spi_driver);
++	class_destroy(mtp02_class);
++	unregister_chrdev(MAJOR(mtp02_dev), mtp02_spi_driver.driver.name);
++}
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Korneliusz Osmenda <korneliuszo@gmail.com>");
++
++module_init(mtp02_init);
++module_exit(mtp02_exit);
+\ No newline at end of file
+diff --git a/drivers/spi/spi-mtp02.h b/drivers/spi/spi-mtp02.h
+new file mode 100644
+index 000000000000..2a16374dd3af
+--- /dev/null
++++ b/drivers/spi/spi-mtp02.h
+@@ -0,0 +1,21 @@
++#ifndef MTP02_IOCTL_H
++#define MTP02_IOCTL_H
++
++#include <linux/ioctl.h>
++
++#define MAJOR_NUM 100
++
++struct mtp02_settings
++{
++	int close_feed;
++	int line_feed;
++	int burn_time;
++	int burn_count;
++	int bytesatonce;
++};
++
++#define MTP02_FEED _IO(MAJOR_NUM,  0)
++#define MTP02_GET_SETTINGS _IOR(MAJOR_NUM,  1, struct mtp02_settings)
++#define MTP02_SET_SETTINGS _IOW(MAJOR_NUM,  2, struct mtp02_settings)
++
++#endif
+--
+2.32.0 (Apple Git-132)
+
