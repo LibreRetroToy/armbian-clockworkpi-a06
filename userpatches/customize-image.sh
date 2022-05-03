@@ -84,10 +84,17 @@ InstallClockworkpiA06() {
 	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
 	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install ${OVERLAY_PATH}/blobs/gearboxplus_2.0_arm64.deb
 
-	# set up build-in tools
-	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-wiringpi-cpi_0.1_arm64.deb
-	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
-	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
+	# set up gpio
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/wiringpi-2.50.deb
+
+	# install printer to firstrun
+	mkdir -p /home/"$USER"/printer
+	cp ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb /home/"$USER"/printer
+	cp ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb /home/"$USER"/printer
+
+	sed -i '/systemctl\ disable\ armbian-firstrun/i \
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y /home/"$USER"/printer/blobs/devterm-thermal-printer_0.3_arm64.deb || exit 0 \
+	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y /home/"$USER"/printer/blobs/devterm-thermal-printer-cups_0.1_arm64.deb || exit 0' /usr/lib/armbian/armbian-firstrun
 
 	# clean up
 	apt clean
