@@ -1,9 +1,9 @@
 diff --git a/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts b/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts
 new file mode 100644
-index 000000000000..1c8fb451a27e
+index 000000000000..0140347a2142
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts
-@@ -0,0 +1,989 @@
+@@ -0,0 +1,1024 @@
 +/*
 + * SPDX-License-Identifier: (GPL-2.0+ or MIT)
 + * Copyright (c) 2017 Fuzhou Rockchip Electronics Co., Ltd.
@@ -12,6 +12,7 @@ index 000000000000..1c8fb451a27e
 + * Copyright (c) 2021 Clockwork Tech LLC
 + * Copyright (c) 2021 Max Fierke <max@maxfierke.com>
 + * Copyright (c) 2022 CXM <littlecxm@gmail.com>
++ * Copyright (c) 2022 Korneliusz Osmenda <korneliuszo@gmail.com>
 + *
 + */
 +
@@ -24,7 +25,7 @@ index 000000000000..1c8fb451a27e
 +
 +/ {
 +	model = "Clockworkpi A06";
-+	compatible = "clockwork,devterm-a06", "rockchip,rk3399";
++	compatible = "clockworkpi,clockworkpi-a06", "rockchip,rk3399";
 +
 +	chosen {
 +		stdout-path = "serial2:1500000n8";
@@ -725,9 +726,29 @@ index 000000000000..1c8fb451a27e
 +	pinctrl-0 = <&spi4_clk &spi4_tx>;
 +
 +	spidev0: spidev@0 {
-+		compatible = "rockchip,spidev";
++		status = "disabled";
++	};
++
++	printer0: printer@0 {
++		compatible = "clockworkpi-a06,printer-mtp02";
 +		reg = <0>;
-+		spi-max-frequency = <10000000>;
++		spi-max-frequency = <4500000>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&printer_pinmux>;
++
++		latch-gpio = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
++		strobe-gpio = <&gpio3 RK_PA7 GPIO_ACTIVE_HIGH>;
++
++		pa-gpio =  <&gpio3 RK_PC0 GPIO_ACTIVE_HIGH>;
++		pan-gpio = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
++		pb-gpio =  <&gpio3 RK_PB5 GPIO_ACTIVE_HIGH>;
++		pbn-gpio = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;
++
++		pwr-gpio = <&gpio3 RK_PA3 GPIO_ACTIVE_HIGH>;
++		pap-gpio = <&gpio3 RK_PA4 GPIO_ACTIVE_HIGH>;
++
++		close-feed = <230>;
++
 +		status = "okay";
 +	};
 +};
@@ -990,6 +1011,20 @@ index 000000000000..1c8fb451a27e
 +
 +		pa_en: pa-en {
 +			rockchip,pins = <3 RK_PB1 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	printer {
++		printer_pinmux: printer-pinmux {
++			rockchip,pins =
++				<3 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>, //latch
++				<3 RK_PA7 RK_FUNC_GPIO &pcfg_pull_none>, //strobe
++				<3 RK_PC0 RK_FUNC_GPIO &pcfg_pull_none>, //PA
++				<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_none>, //PNA
++				<3 RK_PB5 RK_FUNC_GPIO &pcfg_pull_none>, //PB
++				<4 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>, //PNB
++				<3 RK_PA3 RK_FUNC_GPIO &pcfg_pull_none>, //power
++				<3 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>; //paper
 +		};
 +	};
 +};
