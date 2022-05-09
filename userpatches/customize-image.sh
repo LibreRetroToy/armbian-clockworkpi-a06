@@ -99,6 +99,10 @@ InstallClockworkpiA06() {
 	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer_0.3_arm64.deb
 	# apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install -y ${OVERLAY_PATH}/blobs/devterm-thermal-printer-cups_0.1_arm64.deb
 
+	# disable blanking
+	xset dpms 0 0 0
+	xset s off -dpms
+
 	# clean up
 	apt clean
 	chage -d 0 root

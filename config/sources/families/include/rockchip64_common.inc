@@ -297,7 +297,7 @@ family_tweaks_bsp() {
 	fi
 
 	if [[ $BOARD == clockworkpi-a06 ]]; then
-		# rotate screen
+		# rotate screen & disable dpms
 		mkdir -p "$destination"/etc/X11/xorg.conf.d
 		cat <<-EOF >"$destination"/etc/X11/xorg.conf.d/10-monitor.conf
 			# set monitor
