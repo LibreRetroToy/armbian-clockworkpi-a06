@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#------------------------------------------------------------------------------------
+# custom build script for clockworkpi-a06 by CXM
+#
 # arguments: $RELEASE $LINUXFAMILY $BOARD $BUILD_DESKTOP
 #
 # This is the image customization script
@@ -11,6 +13,7 @@
 # NOTE: If you want to transfer files between chroot and host
 # userpatches/overlay directory on host is bind-mounted to /tmp/overlay in chroot
 # The sd card's root path is accessible via $SDCARD variable.
+#------------------------------------------------------------------------------------
 
 RELEASE=$1
 LINUXFAMILY=$2
@@ -79,7 +82,14 @@ InstallClockworkpiA06() {
 
 	# install tools
 	apt update
-	apt install -y -q arandr chromium vlc cpupower-gui xfce4-power-manager
+	codename=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)
+	if [[ "${codename}" == "bullseye" ]]; then
+		# debian-based
+		apt install -y -q arandr chromium vlc cpupower-gui xfce4-power-manager
+	else
+		# buntu-based
+		apt install -y -q arandr chromium-browser vlc cpupower-gui xfce4-power-manager
+	fi
 
 	# install gearboxplus form https://github.com/Mihaylov93/gearboxplus
 	apt --yes --allow-unauthenticated --fix-missing --no-install-recommends install ${OVERLAY_PATH}/blobs/gearboxplus_2.0_arm64.deb
