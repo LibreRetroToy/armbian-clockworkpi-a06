@@ -300,10 +300,19 @@ family_tweaks_bsp() {
 		# rotate screen
 		mkdir -p "$destination"/etc/X11/xorg.conf.d
 		cat <<-EOF >"$destination"/etc/X11/xorg.conf.d/10-monitor.conf
-			# set rotate
+			# set monitor
 			Section "Monitor"
 			        Identifier "DSI-1"
 			        Option "Rotate" "right"
+					Option "DPMS" "false"
+			EndSection
+
+			Section "ServerLayout"
+			    Identifier "ServerLayout0"
+			    Option "BlankTime"  "0"
+			    Option "StandbyTime" "0"
+			    Option "SuspendTime" "0"
+			    Option "OffTime" "0"
 			EndSection
 		EOF
 		# fan support
