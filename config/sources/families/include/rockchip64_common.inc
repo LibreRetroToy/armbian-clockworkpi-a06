@@ -304,15 +304,15 @@ family_tweaks_bsp() {
 			Section "Monitor"
 			        Identifier "DSI-1"
 			        Option "Rotate" "right"
-					Option "DPMS" "false"
+			        Option "DPMS" "false"
 			EndSection
 
 			Section "ServerLayout"
-			    Identifier "ServerLayout0"
-			    Option "BlankTime"  "0"
-			    Option "StandbyTime" "0"
-			    Option "SuspendTime" "0"
-			    Option "OffTime" "0"
+			        Identifier "ServerLayout0"
+			        Option "BlankTime"  "0"
+			        Option "StandbyTime" "0"
+			        Option "SuspendTime" "0"
+			        Option "OffTime" "0"
 			EndSection
 		EOF
 		# fan support
