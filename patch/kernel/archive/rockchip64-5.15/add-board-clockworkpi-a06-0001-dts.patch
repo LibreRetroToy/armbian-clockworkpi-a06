@@ -3,7 +3,7 @@ new file mode 100644
 index 000000000000..0140347a2142
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3399-clockworkpi-a06.dts
-@@ -0,0 +1,1024 @@
+@@ -0,0 +1,1018 @@
 +/*
 + * SPDX-License-Identifier: (GPL-2.0+ or MIT)
 + * Copyright (c) 2017 Fuzhou Rockchip Electronics Co., Ltd.
@@ -720,14 +720,8 @@ index 000000000000..0140347a2142
 +	};
 +};
 +
-+&spidev0: {
-+	status = "disabled";
-+};
-+
 +&spi4 {
 +	status = "okay";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&spi4_clk &spi4_tx>;
 +
 +	printer0: printer@0 {
 +		compatible = "clockworkpi-a06,printer-mtp02";
