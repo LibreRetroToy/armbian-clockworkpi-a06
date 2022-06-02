@@ -2,6 +2,8 @@
 
 Current based on [v22.02](https://github.com/armbian/build/tree/042cdbd6a3e157aaaf8b1d81865c78f45dafbbf4) `042cdbd6a3e157aaaf8b1d81865c78f45dafbbf4`
 
+\*It's not necessary to execute with `git reset` command every time, just put `userpathces` folder to armbian project root if you want build it as yourself.
+
 ## Spec
 
 - SoC: [RK3399](https://www.rock-chips.com/a/en/products/RK33_Series/2016/0419/758.html)
